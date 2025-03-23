@@ -1,0 +1,139 @@
+import java.util.Random; // Импортируем класс Random для генерации случайных чисел
+import java.util.Scanner; // Импортируем класс Scanner для считывания ввода от пользователя
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in); // Создаем объект Scanner для ввода данных
+        int[][] matrix = null; // Исходная матрица
+        double[][] augmentedMatrix = null; // Расширенная матрица с средними значениями
+        double[] averages = null; // Массив для хранения средних значений строк
+
+        while (true) { // Бесконечный цикл для отображения меню
+            System.out.println("Меню:");
+            System.out.println("1) Ввод исходных данных");
+            System.out.println("2) Выполнение алгоритма");
+            System.out.println("3) Вывод результата");
+            System.out.println("4) Завершение работы программы");
+            System.out.print("Выберите пункт меню: ");
+
+            int choice = scanner.nextInt(); // Читаем выбор пользователя
+
+            switch (choice) {
+                case 1: // Пункт 1: Ввод исходных данных
+                    System.out.print("Введите количество строк (N): "); 
+                    int n = scanner.nextInt(); // Считываем количество строк
+                    System.out.print("Введите количество столбцов (M): "); 
+                    int m = scanner.nextInt(); // Считываем количество столбцов
+                    matrix = new int[n][m]; // Инициализируем матрицу размером N x M
+                    System.out.println("1) Ввод данных вручную\n2) Генерация случайных данных");
+                    int inputChoice = scanner.nextInt(); // Считываем выбор метода ввода данных
+
+                    if (inputChoice == 1) { // Ввод данных вручную
+                        fillMatrix(matrix, scanner); // Заполняем матрицу вручную
+                    } else if (inputChoice == 2) { // Генерация случайных данных
+                        Random random = new Random(); // Создаем объект Random
+                        for (int i = 0; i < n; i++) { // Перебираем строки
+                            for (int j = 0; j < m; j++) { // Перебираем столбцы
+                                matrix[i][j] = random.nextInt(100); // Заполняем матрицу случайными числами от 0 до 99
+                            }
+                        }
+                    } else { // Некорректный выбор метода ввода
+                        System.out.println("Некорректный выбор! Пожалуйста, повторите попытку."); 
+                    }
+                    break;
+
+                case 2: // Пункт 2: Выполнение алгоритма
+                    if (matrix == null) { // Проверяем, введены ли данные
+                        System.out.println("Сначала необходимо ввести исходные данные!"); 
+                    } else {
+                        augmentedMatrix = augmentMatrix(matrix); // Расширяем матрицу
+                        averages = calculateAverages(matrix); // Вычисляем средние значения
+                        sortMatrix(augmentedMatrix, averages); // Сортируем матрицу по средним значениям
+                        System.out.println("Алгоритм выполнен успешно.");
+                    }
+                    break;
+
+                case 3: // Пункт 3: Вывод результата
+                    if (augmentedMatrix == null) { // Проверяем, выполнен ли алгоритм
+                        System.out.println("Сначала необходимо выполнить алгоритм!"); 
+                    } else {
+                        System.out.println("Расширенная матрица с средними значениями:");
+                        printMatrix(augmentedMatrix); // Выводим расширенную матрицу
+                    }
+                    break;
+
+                case 4: // Пункт 4: Завершение работы программы
+                    System.out.println("Завершение работы программы."); // Сообщение о завершении
+                    scanner.close(); // Закрываем Scanner
+                    return; // Выходим из программы
+
+                default: // Некорректный ввод
+                    System.out.println("Некорректный выбор! Пожалуйста, повторите попытку."); 
+            }
+        }
+    }
+
+    // Метод для заполнения матрицы вручную
+    private static void fillMatrix(int[][] matrix, Scanner scanner) {
+        for (int i = 0; i < matrix.length; i++) { // Перебираем строки
+            for (int j = 0; j < matrix[i].length; j++) { // Перебираем столбцы
+                System.out.print("Введите элемент [" + i + "][" + j + "]: "); 
+                matrix[i][j] = scanner.nextInt(); // Считываем элемент матрицы
+            }
+        }
+    }
+
+    // Метод для расширения матрицы и добавления средних значений
+    private static double[][] augmentMatrix(int[][] matrix) {
+        int n = matrix.length; // Получаем количество строк
+        double[][] augmentedMatrix = new double[n][matrix[0].length + 1]; // Создаем новую матрицу с одной дополнительной колонкой
+        for (int i = 0; i < n; i++) { // Перебираем строки
+            for (int j = 0; j < matrix[i].length; j++) { // Перебираем столбцы
+                augmentedMatrix[i][j] = matrix[i][j]; // Копируем элементы из исходной матрицы
+            }
+        }
+        return augmentedMatrix; // Возвращаем расширенную матрицу
+    }
+
+    // Метод для вычисления средних значений строк
+    private static double[] calculateAverages(int[][] matrix) {
+        int n = matrix.length; // Получаем количество строк
+        double[] averages = new double[n]; // Создаем массив для хранения средних значений
+        for (int i = 0; i < n; i++) { // Перебираем строки
+            int sum = 0; // Переменная для хранения суммы элементов текущей строки
+            for (int j = 0; j < matrix[i].length; j++) { // Перебираем столбцы
+                sum += matrix[i][j]; // Считаем сумму элементов
+            }
+            averages[i] = (double) sum / matrix[i].length; // Вычисляем среднее значение
+            matrix[i][matrix[i].length - 1] = (int) averages[i]; // Добавляем среднее значение в последнюю ячейку строки
+        }
+        return averages; // Возвращаем массив средних значений
+    }
+
+    // Метод для сортировки матрицы по средним значениям
+    private static void sortMatrix(double[][] augmentedMatrix, double[] averages) {
+        int n = augmentedMatrix.length; // Получаем количество строк
+        for (int i = 0; i < n - 1; i++) { // Сортируем по убыванию
+            for (int j = i + 1; j < n; j++) {
+                if (averages[i] < averages[j]) { // Если среднее значение текущей строки меньше следующей
+                    double[] tempRow = augmentedMatrix[i]; // Меняем местами строки
+                    augmentedMatrix[i] = augmentedMatrix[j];
+                    augmentedMatrix[j] = tempRow;
+                    double tempAvg = averages[i]; // Меняем местами средние значения
+                    averages[i] = averages[j];
+                    averages[j] = tempAvg;
+                }
+            }
+        }
+    }
+
+    // Метод для вывода матрицы на экран
+    private static void printMatrix(double[][] matrix) {
+        for (double[] row : matrix) { // Перебираем строки матрицы
+            for (double elem : row) { // Перебираем элементы строки
+                System.out.printf("%.2f ", elem); // Форматируем вывод с 2 знаками после запятой
+            }
+            System.out.println(); // Переход на новую строку после вывода строки
+        }
+    }
+}
